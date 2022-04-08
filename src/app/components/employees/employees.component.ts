@@ -29,6 +29,9 @@ export class EmployeesComponent implements OnInit, OnDestroy {
   gridCheckAll: boolean = false;
   disableEdit: boolean = true;
   disableRemove: boolean = true;
+  page: number = 0;
+  pageSize: number = 10;
+  field: string = 'firstName';
   
 
   constructor(private employeeService: EmployeesService, private modalService: NgbModal) { }
@@ -40,14 +43,15 @@ export class EmployeesComponent implements OnInit, OnDestroy {
       processing: true,
       lengthChange: false,
     };
-    this.getEmployees(this.empObj.firstName, this.empObj.lastName, this.empObj.position, this.empObj.startDate, this.empObj.salary, 0, 5, 'id');
+    this.getEmployees();
 
   }
 
-  getEmployees(firstName: string, lastName: string, position: Position, startDate: Date, salary: number, page: number, pageSize: number, field: string): void {
-    this.employeeService.list(firstName, lastName, position, startDate, salary, page, pageSize, field).subscribe(employees => {
+  getEmployees(): void {
+    this.employeeService.find(this.page, this.pageSize, this.field).subscribe(employees => {
       this.employees = employees;
       this.dtTrigger.next();
+      console.log(employees);
     }, err=>{
       console.log(err);
     });
@@ -86,7 +90,7 @@ export class EmployeesComponent implements OnInit, OnDestroy {
   }
 
   refreshEmployees(): void {
-    this.getEmployees(this.empObj.firstName, this.empObj.lastName, this.empObj.position, this.empObj.startDate, this.empObj.salary, 0, 5, 'id');
+    this.getEmployees();
     this.checkedEmployeeIds = [];
     this.checkDisabled();
     this.rerender();
