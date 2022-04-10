@@ -1,145 +1,115 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Component, OnInit} from '@angular/core';
+import { Observable} from 'rxjs';
 import { Employee } from '../../model/employee.model';
 import { EmployeesService } from '../../services/employees.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { EmployeeFormComponent } from '../employee-form/employee-form.component';
-import { Position, Position2LabelMapping } from 'src/app/model/position.model';
-import { DataTableDirective } from 'angular-datatables';
-import { EmployeeDeleteComponent } from '../employee-delete/employee-delete.component';
+import { ApiResponse } from 'src/app/shared/apiresponse';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { Position2LabelMapping } from 'src/app/model/position.model';
 
 @Component({
   selector: 'app-employees',
   templateUrl: './employees.component.html',
   styleUrls: ['./employees.component.css']
 })
-export class EmployeesComponent implements OnInit, OnDestroy {
+export class EmployeesComponent implements OnInit {
 
   public Position2LabelMapping = Position2LabelMapping;
 
-  @ViewChild(DataTableDirective, { static: false }) dtElement: DataTableDirective;
-
-
-  dtTrigger: Subject<void> = new Subject<void>() ;
-  dtOptions: any = {};
-
-  employees: Employee[] = [];
-  empObj : Employee = new Employee();
-  checkedEmployeeIds: string[] = [];
-  gridCheckAll: boolean = false;
-  disableEdit: boolean = true;
-  disableRemove: boolean = true;
+  employees: Observable<ApiResponse<Employee>>;
+  empDetail: FormGroup;
+  empObj: Employee = new Employee();
+  empList : Employee[] = [];
   page: number = 0;
   pageSize: number = 10;
   field: string = 'firstName';
+  employeeSize: number;
   
 
-  constructor(private employeeService: EmployeesService, private modalService: NgbModal) { }
+  constructor(private employeeService: EmployeesService, private formBuilder : FormBuilder) {
+   }
 
   ngOnInit(): void {
-    this.dtOptions = {
-      pagingType: 'full_numbers',
-      pageLength: 5,
-      processing: true,
-      lengthChange: false,
-    };
     this.getEmployees();
-
+    
+    this.empDetail = this.formBuilder.group({
+      id : [''],
+      firstName : [''],
+      lastName: [''],
+      position: [''],
+      startDate: [''],
+      salary: ['']
+    });   
   }
 
   getEmployees(): void {
-    this.employeeService.find(this.page, this.pageSize, this.field).subscribe(employees => {
-      this.employees = employees;
-      this.dtTrigger.next();
-      console.log(employees);
-    }, err=>{
+      this.employees = this.employeeService.find(this.page, this.pageSize, this.field);
+  }
+  
+  onPageChange(page: number): void { 
+    this.employees = this.employeeService.find(page-1, this.pageSize, this.field);
+  }
+
+  onSizeChange(pageSize: number): void {
+    this.employees = this.employeeService.find(this.page, pageSize, this.field);
+    console.log(pageSize);
+  }
+
+  addEmployee() {
+    console.log(this.empDetail);
+    this.empObj.id = this.empDetail.value.id;
+    this.empObj.firstName = this.empDetail.value.firstName;
+    this.empObj.lastName = this.empDetail.value.lastName;
+    this.empObj.position = this.empDetail.value.position;
+    this.empObj.startDate = this.empDetail.value.startDate;
+    this.empObj.salary = this.empDetail.value.salary;
+
+    this.employeeService.save(this.empObj).subscribe(res=>{
+        console.log(res);
+        this.getEmployees();
+    },err=>{
+        console.log(err);
+    });
+
+  }
+
+  editEmployee(emp : Employee) {
+    this.empDetail.controls['id'].setValue(emp.id);
+    this.empDetail.controls['firstName'].setValue(emp.firstName);
+    this.empDetail.controls['lastName'].setValue(emp.lastName);
+    this.empDetail.controls['position'].setValue(emp.position);
+    this.empDetail.controls['startDate'].setValue(emp.startDate);
+    this.empDetail.controls['salary'].setValue(emp.salary);
+
+  }
+
+  updateEmployee() {
+
+    this.empObj.id = this.empDetail.value.id;
+    this.empObj.firstName = this.empDetail.value.firstName;
+    this.empObj.lastName = this.empDetail.value.lastName;
+    this.empObj.position = this.empDetail.value.position;
+    this.empObj.startDate = this.empDetail.value.startDate;
+    this.empObj.salary = this.empDetail.value.salary;
+
+    this.employeeService.update(this.empObj).subscribe(res=>{
+      console.log(res);
+      this.getEmployees();
+    },err=>{
+      console.log(err);
+    })
+
+  }
+
+  deleteEmployee(emp : Employee) {
+
+    this.employeeService.delete(emp).subscribe(res=>{
+      console.log(res);
+      alert('Employee deleted successfully');
+      this.getEmployees();
+    },err => {
       console.log(err);
     });
-  }
-  
-  
-  openForAdd(): void {
-    const modalRef = this.modalService.open(EmployeeFormComponent);
-    modalRef.componentInstance.employee = new Employee();
-    modalRef.result.then((data) => {
-      this.refreshEmployees();
-    }, (reason) => {
-      // on dismiss
-    });
-  }
 
-  openForEdit(): void {
-    const modalRef = this.modalService.open(EmployeeFormComponent);
-    modalRef.componentInstance.employee = this.employees.find(e => e.id == this.checkedEmployeeIds[0]);
-    modalRef.result.then((data) => {
-      this.refreshEmployees();
-    }, (reason) => {
-      // on dismiss
-    });
-  }
-
-  openDeleteConfirmation(): void {
-    const modalRef = this.modalService.open(EmployeeDeleteComponent);
-    modalRef.componentInstance.employees = this.employees.filter(e => this.checkedEmployeeIds.includes(e.id));
-
-    modalRef.result.then((data) => {
-      this.refreshEmployees();
-    }, (reason) => {
-      // on dismiss
-    });
-  }
-
-  refreshEmployees(): void {
-    this.getEmployees();
-    this.checkedEmployeeIds = [];
-    this.checkDisabled();
-    this.rerender();
-  }
-
-  rowCheckBoxChecked(e, employeeId): void {
-    if (e.currentTarget.checked) {
-      this.checkedEmployeeIds.push(employeeId);
-    } else {
-      this.checkedEmployeeIds.splice(this.checkedEmployeeIds.indexOf(employeeId), 1);
-    }
-
-    this.checkDisabled();
-  }
-
-  gridAllRowsCheckBoxChecked(e): void {
-    this.checkedEmployeeIds = [];
-
-    if (this.gridCheckAll) {
-      this.gridCheckAll = false;
-      this.employees.forEach(e => e.checked = false);
-
-    } else {
-      this.gridCheckAll = true;
-      this.employees.forEach(e => {
-        e.checked = true;
-        this.checkedEmployeeIds.push(e.id);
-      });
-    }
-
-    this.checkDisabled();
-  }
-
-  checkDisabled(): void {
-    this.disableEdit = this.checkedEmployeeIds.length != 1;
-    this.disableRemove = this.checkedEmployeeIds.length < 1;
-  }
-
-  rerender(): void {
-    this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
-      // Destroy the table first
-      dtInstance.destroy();
-      // Call the dtTrigger to rerender again
-      this.dtTrigger.next();
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.dtTrigger.unsubscribe();
   }
 
 }

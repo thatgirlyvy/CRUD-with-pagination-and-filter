@@ -1,40 +1,147 @@
-<div class="row">
-    <div class="col-12">
-        <button class="btn btn-primary mr-1" (click)="openForAdd()">Add</button>
+<div class="container-fluid">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Employee Management System</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#addEmployee" type="submit">Add Employee</button>
+          </div>
+        </div>
+    </nav>
+    <!-- <p> number of elements per page </p> -->
+    <!-- <mat-form-field appearance="fill">
+      <mat-label> page size </mat-label>
+      <select matNativeControl required #mySelect (change)="onSizeChange(mySelect.value)">
+        <option value=5> 5 </option>
+        <option value=10> 10 </option>
+        <option value=25> 25 </option>
+        <option value=100> 100 </option>
+      </select>
+    </mat-form-field> -->
+    <div class="panel-body" *ngIf="employees | async as response">
         
-        <button class="btn btn-warning mr-1" (click)="openForEdit()" [disabled]="disableEdit">Edit</button>
-
-        <button class="btn btn-danger" (click)="openDeleteConfirmation()" [disabled]="disableRemove">Delete</button>
-
-        <table class="table table-sm row-border hover" datatable
-               [dtTrigger]="dtTrigger">
+        <table class="table table-hover">
             <thead>
             <tr>
-                <th>
-                    <input type="checkbox" [value]="gridCheckAll"
-                           (change)="gridAllRowsCheckBoxChecked($event)"/>
-                </th>
-                <th>First name</th>
-                <th>Last name</th>
-                <th>Position</th>
-                <th>Start date</th>
-                <th>Salary</th>
+                <th scope="col">Employee ID</th>
+                <th scope="col">First name</th>
+                <th scope="col">Last name</th>
+                <th scope="col">Position</th>
+                <th scope="col">Start date</th>
+                <th scope="col">Salary</th>
+                <th scope="col">Actions</th>
             </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let e of employees">
-                <td>
-                    <input type="checkbox" [(ngModel)]="e.checked"
-                           (change)="rowCheckBoxChecked($event, e.id)"/>
-                </td>
+            <tr *ngFor="let e of response.data">
+                <td>{{e.id}}</td>
                 <td>{{e.firstName}}</td>
                 <td>{{e.lastName}}</td>
                 <td>{{Position2LabelMapping[e.position]}}</td>
                 <td>{{e.startDate | date}}</td>
                 <td>{{e.salary | currency}}</td>
+                <td>
+                  <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#editEmployee" (click)="editEmployee(e)">Edit</button>
+                  <button type="button" class="btn btn-outline-danger" (click)="deleteEmployee(e)">Delete</button>
+                  </td>
             </tr>
             </tbody>
         </table>
+                          <ngb-pagination 
+                    [collectionSize]="response.totalElements"
+                    [pageSize]="pageSize"
+                    [(page)]="page" 
+                    [boundaryLinks]="true"
+                    (pageChange) = "onPageChange(page)">
+                  </ngb-pagination>
+
+     <!-- Add employee modal -->
+  <div class="modal fade" id="addEmployee" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add new Employee</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          
+            <form [formGroup]="empDetail">
+                <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">First Name </label>
+                    <input type="text" formControlName="firstName" class="form-control" id="firstName" aria-describedby="emailHelp">
+                  </div>
+                <div class="mb-3">
+                  <label for="exampleInputEmail1" class="form-label"> Last Name </label>
+                  <input type="text" formControlName="lastName" class="form-control" id="lastName" aria-describedby="emailHelp">
+                </div>
+                <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label"> Position </label>
+                    <input type="text" formControlName="position" class="form-control" id="position" aria-describedby="emailHelp">
+                  </div>
+                  <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label"> Start Date </label>
+                    <input type="date" formControlName="startDate" class="form-control" id="startDate" aria-describedby="emailHelp">
+                  </div>
+                  <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label"> Salary </label>
+                    <input type="number" formControlName="salary" class="form-control" id="salary" aria-describedby="emailHelp">
+                  </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="addEmployee()">Add employee</button>
+                  </div>
+              </form>
+
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- Edit employee modal -->
+  <div class="modal fade" id="editEmployee" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Edit employee details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+
+            <form [formGroup]="empDetail">
+                <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label"> First Name </label>
+                    <input type="text" formControlName="firstName" class="form-control" id="firstName" aria-describedby="emailHelp">
+                  </div>
+                <div class="mb-3">
+                  <label for="exampleInputEmail1" class="form-label"> Last Name </label>
+                  <input type="text" formControlName="lastName" class="form-control" id="lastName" aria-describedby="emailHelp">
+                </div>
+                <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Position </label>
+                    <input type="text" formControlName="position" class="form-control" id="position" aria-describedby="emailHelp">
+                  </div>
+                  <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Start Date </label>
+                    <input type="date" formControlName="startDate" class="form-control" id="startDate" aria-describedby="emailHelp">
+                  </div>
+                  <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Salary </label>
+                    <input type="number" formControlName="salary" class="form-control" id="salary" aria-describedby="emailHelp">
+                  </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-success" (click)="updateEmployee()" data-bs-dismiss="modal">Update </button>
+                  </div>
+              </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
 
     </div>
 </div>

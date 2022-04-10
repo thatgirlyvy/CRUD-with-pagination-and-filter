@@ -5,5 +5,4 @@ export class Employee {
     position?: string;
     salary?: number;
     startDate?: Date;
-    checked: boolean;
   }
