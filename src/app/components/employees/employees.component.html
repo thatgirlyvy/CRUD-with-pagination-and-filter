@@ -39,7 +39,7 @@
                 <td>{{e.id}}</td>
                 <td>{{e.firstName}}</td>
                 <td>{{e.lastName}}</td>
-                <td>{{Position2LabelMapping[e.position]}}</td>
+                <td>{{e.position}}</td>
                 <td>{{e.startDate | date}}</td>
                 <td>{{e.salary | currency}}</td>
                 <td>
@@ -49,13 +49,7 @@
             </tr>
             </tbody>
         </table>
-                          <ngb-pagination 
-                    [collectionSize]="response.totalElements"
-                    [pageSize]="pageSize"
-                    [(page)]="page" 
-                    [boundaryLinks]="true"
-                    (pageChange) = "onPageChange(page)">
-                  </ngb-pagination>
+                         
 
      <!-- Add employee modal -->
   <div class="modal fade" id="addEmployee" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -142,7 +136,15 @@
       </div>
     </div>
   </div>
+  <ngb-pagination 
+  [collectionSize]="response.totalElements"
+  [pageSize]="pageSize"
+  [(page)]="page" 
+  [boundaryLinks]="true"
+  (pageChange) = "onPageChange(page)">
+</ngb-pagination>
 
     </div>
+
 </div>
 

@@ -9,6 +9,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule} from '@angular/material/form-field'
 import { ControlMessages } from './shared/control.message';
 import { AngularDateHttpInterceptor } from './shared/date.interceptor';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { AngularDateHttpInterceptor } from './shared/date.interceptor';
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    NgbModule
   ],
   providers: [
     {

@@ -4,7 +4,6 @@ import { Employee } from '../../model/employee.model';
 import { EmployeesService } from '../../services/employees.service';
 import { ApiResponse } from 'src/app/shared/apiresponse';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Position2LabelMapping } from 'src/app/model/position.model';
 
 @Component({
   selector: 'app-employees',
@@ -13,14 +12,13 @@ import { Position2LabelMapping } from 'src/app/model/position.model';
 })
 export class EmployeesComponent implements OnInit {
 
-  public Position2LabelMapping = Position2LabelMapping;
 
   employees: Observable<ApiResponse<Employee>>;
   empDetail: FormGroup;
   empObj: Employee = new Employee();
   empList : Employee[] = [];
   page: number = 0;
-  pageSize: number = 10;
+  pageSize: number = 5;
   field: string = 'firstName';
   employeeSize: number;
   
@@ -30,7 +28,9 @@ export class EmployeesComponent implements OnInit {
 
   ngOnInit(): void {
     this.getEmployees();
-    
+    this.employees.subscribe(res => {
+      console.log(res);
+    });
     this.empDetail = this.formBuilder.group({
       id : [''],
       firstName : [''],
