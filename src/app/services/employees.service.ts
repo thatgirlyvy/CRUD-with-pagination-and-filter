@@ -34,6 +34,52 @@ export class EmployeesService {
     return this.http.get<ApiResponse<Employee>>(`${environment.baseUrl}/employees`, { params });
   }
 
+  findf(page: number, pageSize: number, field: string, firstName: string): Observable<ApiResponse<Employee>> {
+    let params = new HttpParams();
+    params = params.append('firstName', firstName);
+    params = params.append('page', page.toString());
+    params = params.append('pageSize', pageSize.toString());
+    params = params.append('field', field);
+    return this.http.get<ApiResponse<Employee>>(`${environment.baseUrl}/employees`, { params });
+  }
+
+  findl(page: number, pageSize: number, field: string, lastName: string): Observable<ApiResponse<Employee>> {
+    let params = new HttpParams();
+    params = params.append('lastName', lastName);
+    params = params.append('page', page.toString());
+    params = params.append('pageSize', pageSize.toString());
+    params = params.append('field', field);
+    return this.http.get<ApiResponse<Employee>>(`${environment.baseUrl}/employees`, { params });
+  }
+
+  findp(page: number, pageSize: number, field: string, position: string): Observable<ApiResponse<Employee>> {
+    let params = new HttpParams();
+    params = params.append('position', position);
+    params = params.append('page', page.toString());
+    params = params.append('pageSize', pageSize.toString());
+    params = params.append('field', field);
+    return this.http.get<ApiResponse<Employee>>(`${environment.baseUrl}/employees`, { params });
+  }
+
+  findt(page: number, pageSize: number, field: string, startDate: string): Observable<ApiResponse<Employee>> {
+    let params = new HttpParams();
+    params = params.append('startDate', startDate.toString());
+    params = params.append('page', page.toString());
+    params = params.append('pageSize', pageSize.toString());
+    params = params.append('field', field);
+    return this.http.get<ApiResponse<Employee>>(`${environment.baseUrl}/employees`, { params });
+  }
+
+  finds(page: number, pageSize: number, field: string, salary: number): Observable<ApiResponse<Employee>> {
+    let params = new HttpParams();
+    params = params.append('salary', salary.toString());
+    params = params.append('page', page.toString());
+    params = params.append('pageSize', pageSize.toString());
+    params = params.append('field', field);
+    return this.http.get<ApiResponse<Employee>>(`${environment.baseUrl}/employees`, { params });
+  }
+
+
   filter(firstName: string, lastName: string, position: string, startDate: Date, salary: number): Observable<ApiResponse<Employee>> {
     let params = new HttpParams();
     params = params.append('firstName', firstName);

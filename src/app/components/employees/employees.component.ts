@@ -4,6 +4,7 @@ import { Employee } from '../../model/employee.model';
 import { EmployeesService } from '../../services/employees.service';
 import { ApiResponse } from 'src/app/shared/apiresponse';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { faArrowDownAZ, faCoffee } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-employees',
@@ -19,18 +20,23 @@ export class EmployeesComponent implements OnInit {
   empList : Employee[] = [];
   page: number = 0;
   pageSize: number = 5;
-  field: string = 'firstName';
+  field: string = 'id';
   employeeSize: number;
-  
+  firstName : string = "";
+  lastName : string = "";
+  position: string = "";
+  salary : number;
+  startDate : string = "";
+  faArrow = faArrowDownAZ;
 
   constructor(private employeeService: EmployeesService, private formBuilder : FormBuilder) {
    }
 
   ngOnInit(): void {
     this.getEmployees();
-    this.employees.subscribe(res => {
-      console.log(res);
-    });
+    // this.employees.subscribe(res => {
+    //   console.log(res);
+    // });
     this.empDetail = this.formBuilder.group({
       id : [''],
       firstName : [''],
@@ -41,10 +47,33 @@ export class EmployeesComponent implements OnInit {
     });   
   }
 
-  getEmployees(): void {
-      this.employees = this.employeeService.find(this.page, this.pageSize, this.field);
+  getEmployees() {
+    this.employees = this.employeeService.find(this.page, this.pageSize, this.field)
+    console.log(this.field);
+    console.log(this.page);
+    console.log(this.pageSize)
   }
+
+  getEmployeesf(page: number = this.page): void {
+      this.employees = this.employeeService.findf(page, this.pageSize, this.field, this.firstName);
+  }
+
+  getEmployeesl(page: number = this.page): void {
+    this.employees = this.employeeService.findl(page, this.pageSize, this.field, this.lastName);
+}
+
+getEmployeesp(page: number = this.page): void {
+  this.employees = this.employeeService.findp(page, this.pageSize, this.field, this.position);
+}
   
+getEmployeess(page: number = this.page): void {
+  this.employees = this.employeeService.finds(page, this.pageSize, this.field, this.salary);
+}
+
+getEmployeest(page: number = this.page): void {
+  this.employees = this.employeeService.findt(page, this.pageSize, this.field, this.startDate);
+}
+
   onPageChange(page: number): void { 
     this.employees = this.employeeService.find(page-1, this.pageSize, this.field);
   }
@@ -82,6 +111,62 @@ export class EmployeesComponent implements OnInit {
 
   }
 
+  onChangeFieldp(field : string) {
+    console.log(this.page)
+    this.employees = this.employeeService.find(this.page-1, this.pageSize, 'position')
+    this.employeeService.find(this.page-1, this.pageSize, 'position').subscribe(res=>{
+      console.log(res);
+      console.log(field);
+      console.log(this.page);
+      console.log(this.pageSize);
+    },err=>{
+      console.log(err);
+    });
+
+  }
+
+  onChangeFieldf(field : string) {
+    console.log(this.page)
+    this.employees = this.employeeService.find(this.page-1, this.pageSize, 'firstName')
+    this.employeeService.find(this.page-1, this.pageSize, 'firstName').subscribe(res=>{
+      console.log(res);
+      console.log(field);
+      console.log(this.page);
+      console.log(this.pageSize);
+    },err=>{
+      console.log(err);
+    });
+
+  }
+
+  onChangeFieldl(field : string) {
+    console.log(this.page)
+    this.employees = this.employeeService.find(this.page-1, this.pageSize, 'lastName')
+    this.employeeService.find(this.page-1, this.pageSize, 'lastName').subscribe(res=>{
+      console.log(res);
+      console.log(field);
+      console.log(this.page);
+      console.log(this.pageSize);
+    },err=>{
+      console.log(err);
+    });
+
+  }
+
+  onChangeFieldt(field : string) {
+    console.log(this.page)
+    this.employees = this.employeeService.find(this.page-1, this.pageSize, 'startDate')
+    this.employeeService.find(this.page-1, this.pageSize, 'startDate').subscribe(res=>{
+      console.log(res);
+      console.log(field);
+      console.log(this.page);
+      console.log(this.pageSize);
+    },err=>{
+      console.log(err);
+    });
+
+  }
+
   updateEmployee() {
 
     this.empObj.id = this.empDetail.value.id;
@@ -98,6 +183,10 @@ export class EmployeesComponent implements OnInit {
       console.log(err);
     })
 
+  }
+
+  ngOnChanges(changes: any) {
+    console.log(changes.myInput.currentValue);
   }
 
   deleteEmployee(emp : Employee) {

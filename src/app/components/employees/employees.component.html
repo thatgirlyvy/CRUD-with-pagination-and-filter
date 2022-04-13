@@ -20,17 +20,34 @@
         <option value=100> 100 </option>
       </select>
     </mat-form-field> -->
+
     <div class="panel-body" *ngIf="employees | async as response">
         
         <table class="table table-hover">
             <thead>
             <tr>
                 <th scope="col">Employee ID</th>
-                <th scope="col">First name</th>
-                <th scope="col">Last name</th>
-                <th scope="col">Position</th>
-                <th scope="col">Start date</th>
-                <th scope="col">Salary</th>
+                <th scope="col">First name <button (click)="onChangeFieldf('firstName')"><fa-icon [icon]="faArrow" ></fa-icon> </button>
+                  <div>
+                  <input type="text" class="form-control" [(ngModel)]="firstName" (keyup.enter)="getEmployees(0)"/>
+                </div></th>
+                <th scope="col" >Last name <button (click)="onChangeFieldl('lastName')"><fa-icon [icon]="faArrow" ></fa-icon> </button>
+                  <div>
+                  <input type="text" class="form-control" [(ngModel)]="lastName" (keyup.enter)="getEmployeesl(0)"/>
+                </div></th>
+                <th scope="col">Position <button (click)="onChangeFieldp('position')"><fa-icon [icon]="faArrow" ></fa-icon> </button>
+                   <div>
+                  <input type="text" class="form-control" [(ngModel)]="position" (keyup.enter)="getEmployeesp(0)"/>
+                </div></th>
+                <th scope="col">Start date <button (click)="onChangeFieldt('startDate')"><fa-icon [icon]="faArrow" ></fa-icon> </button>
+                  <div>
+                    <input type="date" class="form-control" [(ngModel)]="startDate" (keyup.enter)="getEmployeest(0)"/>
+                  </div>
+                </th>
+                <th scope="col">Salary 
+                   <div>
+                  <input type="number" class="form-control" [(ngModel)]="salary" (keyup.enter)="getEmployeess(0)"/>
+                </div></th>
                 <th scope="col">Actions</th>
             </tr>
             </thead>
@@ -40,7 +57,7 @@
                 <td>{{e.firstName}}</td>
                 <td>{{e.lastName}}</td>
                 <td>{{e.position}}</td>
-                <td>{{e.startDate | date}}</td>
+                <td>{{e.startDate | date : 'yyyy-MM-dd'}}</td>
                 <td>{{e.salary | currency}}</td>
                 <td>
                   <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#editEmployee" (click)="editEmployee(e)">Edit</button>
